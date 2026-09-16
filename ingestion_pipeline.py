@@ -32,9 +32,46 @@ def load_documents(docs_path="docs"):
     
     return documents
 
+
+    # Chunking the documents
+def split_documents(documents, chunk_size=800, chunk_overlap=0):
+        print(f"\nSplitting documents into chunks of size {chunk_size} with overlap {chunk_overlap}...")
+        text_splitter = CharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+        chunks = text_splitter.split_documents(documents)
+
+        if chunks:
+
+            for i, chunk in enumerate(chunks[:5]):
+                print(f"\nChunk {i + 1}:")
+                print(f" Content length: {len(chunk.page_content)} characters")
+                print(f" Content preview: {chunk.page_content[:200]}...")  # Print first 200 characters
+                print(f" Metadata: {chunk.metadata}")
+
+            if len(chunks) > 5:
+                print(f"\n... and {len(chunks)-5} more chunks.")
+        return chunks
+
+def create_vector_store(chunks, persist_directory="db/chroma_db"):
+    print("---- Creating vector store in directory -----")
+
+    embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
+
+    vector_store = Chroma.from_documents(documents=chunks,embedding=embedding_model, persist_directory=persist_directory, collection_metadata={"hsw:space": "cosine"})
+    print("---- Finished creating vector store in directory -----")
+    print(f"Vector store created and saved in directory: {persist_directory}")
+    return vector_store
+
 def main():
     print("Main function")
 
+    # Load the documents
+    documents = load_documents(docs_path="docs")
+
+    # Split the documents into chunks
+    chunks = split_documents(documents)
+
+    # Create the vector store
+    vectorstore = create_vector_store(chunks)
 
 
 if __name__ == "__main__":
