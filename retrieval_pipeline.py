@@ -13,7 +13,7 @@ embedding_model = OpenAIEmbeddings(model="text-embedding-3-small")
 # Initialize the Chroma vector store
 db = Chroma(persist_directory=persist_directory, embedding_function=embedding_model, collection_metadata={"hnsw:space": "cosine"})
 
-query = "Which island does SpaceX lease for its launches in the pacific?"
+query = "How much did Microsoft pay to acquire GitHub?"
 
 retriever = db.as_retriever(
     search_kwargs={"k": 10}
